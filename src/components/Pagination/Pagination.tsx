@@ -12,11 +12,16 @@ export const Pagination = ({
   onPageChange,
 }: Props) => {
   const countPages = Math.ceil(total / perPage);
-  const arrayPages = Array.from({ length: countPages }, (_, i) => i + 1);
+  // Для случая total === 0 показываем хотя бы 1 страницу в UI
+  const arrayPages =
+    countPages === 0
+      ? [1]
+      : Array.from({ length: countPages }, (_, i) => i + 1);
   const isFirstPage = currentPage === 1;
-  const isLastPage = countPages === currentPage;
+  const isLastPage = countPages === 0 || currentPage >= countPages;
 
-  if (countPages <= 1) {
+  // Показываем пагинацию только если больше 1 страницы И есть элементы
+  if (countPages === 1 && total > 0) {
     return null;
   }
 
@@ -44,7 +49,8 @@ export const Pagination = ({
           key={item}
           onClick={e => {
             e.preventDefault();
-            if (item !== currentPage) {
+            // Не переключаем страницы если нет элементов или уже на нужной странице
+            if (item !== currentPage && total > 0) {
               onPageChange(item);
             }
           }}
